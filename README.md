@@ -27,14 +27,11 @@ src/
 ├── Main.kt                      # Punto de entrada de la aplicación
 ├── Controller/
 │   ├── Comparison.kt            # Controlador de comparación de equipos
-│   ├── ConfrontationPlayer.kt   # Controlador de enfrentamiento
-│   └── RandomNumber.kt          # Utilidad para números aleatorios
+│   └── ConfrontationPlayer.kt   # Controlador de enfrentamiento
 ├── Model/
 │   ├── Match.kt                 # Lógica de simulación del partido
 │   ├── Player.kt                # Clase base de jugador
-│   ├── PlayerDefense.kt         # Jugador defensa
-│   ├── PlayerMiddle.kt          # Jugador mediocampista
-│   ├── PlayerForward.kt         # Jugador delantero
+│   ├── Players.kt               # Especializaciones de jugadores
 │   └── Team.kt                  # Gestión de equipos
 └── View/
     └── ConsoleView.kt           # Vista de consola
