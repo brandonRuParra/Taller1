@@ -1,89 +1,53 @@
 package Model
 
 /**
- * Representa un equipo de jugadores en el sistema de simulación de partidos.
- *
- * Esta clase gestiona un conjunto de jugadores organizados en diferentes posiciones
- * (defensas, mediocampistas y delanteros) que conforman un equipo completo.
- * Proporciona funcionalidades para crear el grupo de jugadores con una distribución
- * específica de posiciones y para mostrar la información del equipo.
- *
- * @property name Nombre del equipo
- * @property group Lista mutable que contiene todos los jugadores del equipo
- *
- * @constructor Crea un nuevo equipo con el nombre especificado y una lista de jugadores vacía
- *
- * @see Player
- * @see PlayerDefense
- * @see PlayerMiddle
- * @see PlayerForward
+ * Representa un equipo de jugadores con capacidad de gestionar marcador.
  */
-class Team (var name : String){
-    /**
-     * Lista mutable que contiene todos los jugadores que conforman el equipo.
-     *
-     * Los jugadores se agregan mediante el método [createGroup] y pueden ser
-     * de diferentes tipos: defensas, mediocampistas o delanteros.
-     */
-    val group = mutableListOf<Player>()
+class Team(val name: String) {
+    
+    private val _players = mutableListOf<Player>()
+    val players: List<Player> get() = _players
+    
+    var score: Int = 0
+        private set
 
-    /**
-     * Crea y agrega jugadores al equipo con una distribución específica de posiciones.
-     *
-     * Este método genera la plantilla completa del equipo creando instancias de
-     * jugadores especializados según las cantidades especificadas para cada posición:
-     * - Primero se crean los defensas
-     * - Luego los mediocampistas
-     * - Finalmente los delanteros
-     *
-     * Cada jugador se inicializa con estadísticas aleatorias apropiadas a su posición
-     * y se agrega a la lista [group] del equipo.
-     *
-     * @param quantityDefense Número de jugadores defensas a crear
-     * @param quantityMiddle Número de jugadores mediocampistas a crear
-     * @param quantityForward Número de jugadores delanteros a crear
-     *
-     * @see PlayerDefense
-     * @see PlayerMiddle
-     * @see PlayerForward
-     */
-    fun createGroup( quantityDefense: Int, quantityMiddle: Int, quantityForward: Int ) {
-        repeat(quantityDefense) {
-            group.add(PlayerDefense())
+    /** Crea y agrega jugadores al equipo. Retorna this para builder pattern. */
+    fun createGroup(defenses: Int, midfielders: Int, forwards: Int): Team {
+        _players.apply {
+            addAll(List(defenses) { PlayerDefense() })
+            addAll(List(midfielders) { PlayerMiddle() })
+            addAll(List(forwards) { PlayerForward() })
         }
-        repeat(quantityMiddle) {
-            group.add(PlayerMiddle())
-        }
-        repeat(quantityForward) {
-            group.add(PlayerForward())
-        }
+        return this
     }
 
-    /**
-     * Muestra en consola la información completa del equipo.
-     *
-     * Este método imprime el nombre del equipo seguido de la información detallada
-     * de cada jugador que lo conforma, utilizando el método [Player.showData] de
-     * cada jugador para mostrar sus estadísticas.
-     *
-     * Formato de salida:
-     * - Primera línea: "se creo un equipo llamado' [NOMBRE] ' conformado por: "
-     * - Líneas siguientes: Información de cada jugador según su tipo
-     *
-     * @sample
-     * ```
-     * // Salida de ejemplo:
-     * // se creo un equipo llamado' Tigers ' conformado por:
-     * // Player defense created: id:1 atk: 3 def: 7
-     * // Player middle created: id:2 atk: 5 def: 5
-     * // Player Atacker created: id:3 atk: 8 def: 2
-     * ```
-     *
-     * @see Player.showData
-     */
-    fun showTeam (){
-        println("se creo un equipo llamado' $name ' conformado por: ")
-        group.forEach {it.showData()}
+    fun addGoal() {
+        score++
     }
-
+    
+    fun resetScore() {
+        score = 0
+    }
+    
+    companion object {
+        private const val MIN_PLAYERS_TOTAL = 3
+        private const val MIN_PLAYERS_PER_POSITION = 1
+        
+        /**
+         * Crea un equipo con distribución aleatoria de jugadores (mínimo 1 por posición).
+         * @throws IllegalArgumentException si numPlayers < 3
+         */
+        fun createRandom(name: String, numPlayers: Int): Team {
+            require(numPlayers >= MIN_PLAYERS_TOTAL) { 
+                "Un equipo necesita al menos $MIN_PLAYERS_TOTAL jugadores (1 por posición)" 
+            }
+            
+            val defenses = (MIN_PLAYERS_PER_POSITION..(numPlayers - 2)).random()
+            val remaining = numPlayers - defenses
+            val midfielders = (MIN_PLAYERS_PER_POSITION..(remaining - 1)).random()
+            val forwards = remaining - midfielders
+            
+            return Team(name).createGroup(defenses, midfielders, forwards)
+        }
+    }
 }
